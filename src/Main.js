@@ -24,34 +24,56 @@ import {
 } from "react-router-dom";
 import Home from "./Home";
 import Stuff from "./Stuff";
-import Contacts from "./Contacts";
+import Waveform from "./Waveform";
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+} from 'chart.js';
+
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend
+);
+
 
 const drawerWidth = 240;
 
 class Main extends Component {
-  render() {
-    //const [mobileOpen, setMobileOpen] = React.useState(false);
+  onload() {
+    console.log("loaded")
+    //WaveDrom.ProcessAll()
+  }
 
-    // const handleDrawerToggle = () => {
-    //   setMobileOpen(!mobileOpen);
-    // };
-    let links = ["/", "/stuff", "/contacts"]
+  render() {
+    let links = ["/", "/waveform", "/stuff"]
     const drawer = (
       <div>
         <Toolbar />
         <Divider />
         <List>
-          {['Home', 'Waveform', 'Svod'].map((text, index) => (
-            <ListItem key={text} disablePadding>
-              <ListItemButton>
-                <ListItemIcon>
-                  {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-                </ListItemIcon>
-                <NavLink to={links[index]}>
-                  <ListItemText primary={text} />
-                </NavLink>
-              </ListItemButton>
-            </ListItem>
+          {['Home', 'Waveform', 'Svod'].map((text, index) => ( 
+            <NavLink to={links[index]}> 
+              <ListItem key={text} disablePadding>
+                <ListItemButton>
+                  <ListItemIcon>
+                    {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
+                  </ListItemIcon>
+                    <ListItemText primary={text} />
+                </ListItemButton>
+                
+              </ListItem>
+            </NavLink>   
           ))}
         </List>
       </div>
@@ -95,7 +117,7 @@ class Main extends Component {
           <Routes>
             <Route exact path="/" element={<Home/>}/>
             <Route path="/stuff" element={<Stuff/>}/>
-            <Route path="/contacts" element={<Contacts/>}/>
+            <Route path="/waveform" element={<Waveform/>}/>
           </Routes> 
         </Box>
       </Box>

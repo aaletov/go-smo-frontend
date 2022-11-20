@@ -1,0 +1,13 @@
+.WaveDrom {
+  height: 90vh;
+  /* width: 100%; */
+}
+
+/* #WaveDrom_Display_0{
+  margin: 1px;
+} */
+
+svg {
+  height: auto;
+  width: auto;
+}
