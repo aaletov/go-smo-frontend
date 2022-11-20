@@ -54,27 +54,34 @@ export default function Stuff() {
   // }, 2000);
   
   return (
-    <Box sx={{
-      overflowX: "scroll"
-      }}
+    <Box 
       height = "90vh"
-      width = {width}
-      >
-      <Line
-        //ref = {ref}
-        type = "bar"
-        // data = {{
-        //   labels: plotLabels,
-        //   datasets: [{
-        //     label: '# of Votes',
-        //     data: setData,
-        //     borderWidth: 1
-        //   }]
-        // }}
-        data = {grid.data}
-        //data = {grid.data}
-        options = {grid.options}
-      />
+      width = "100%"
+      margin = "10px"
+    >
+      <Box sx={{
+        overflowX: "scroll"
+        }}
+        height = "inherit"
+        width = {width}
+        margin = "30px"
+        >
+        <Line
+          //ref = {ref}
+          type = "bar"
+          // data = {{
+          //   labels: plotLabels,
+          //   datasets: [{
+          //     label: '# of Votes',
+          //     data: setData,
+          //     borderWidth: 1
+          //   }]
+          // }}
+          data = {grid.data}
+          //data = {grid.data}
+          options = {grid.options}
+        />
+      </Box>
     </Box>
   );
 }

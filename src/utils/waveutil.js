@@ -1,4 +1,7 @@
 import { Utils } from 'react-chartjs-2';
+import {Chart} from 'chart.js';
+import ChartDataLabels from 'chartjs-plugin-datalabels';
+
 
 export const CHART_COLORS = {
   red: 'rgb(255, 99, 132)',
@@ -27,33 +30,39 @@ export default async function getGrid() {
   gridX.push(endX)
   console.log(waveInfo)
   
-  const sources = []
+  const sourcesWave = []
   waveInfo.sources.forEach((apiSource) => {
-    sources.push({
+    const wave = getSourceWave(apiSource, dotNum, stepX)
+    sourcesWave.push({
       name: `Source #${apiSource.sourceNum}`,
-      dots: getSourceWave(apiSource, dotNum, stepX),
+      dots: wave.dots,
+      labels : wave.labels,
     })
   })
 
-  const buffers = []
+  const buffersWave = []
   waveInfo.buffers.forEach((apiBuffer) => {
-    buffers.push({
+    const wave = getBufferWave(apiBuffer, dotNum, stepX)
+    buffersWave.push({
       name: `Buffer #${apiBuffer.bufNum}`,
-      dots: getBufferWave(apiBuffer, dotNum, stepX)
+      dots: wave.dots,
+      labels: wave.labels,
     })
   })
 
-  const devices = []
+  const devicesWave = []
   waveInfo.devices.forEach((apiDevice) => {
-    devices.push({
+    const wave = getDeviceWave(apiDevice, dotNum, stepX)
+    devicesWave.push({
       name: `Device #${apiDevice.devNum}`,
-      dots: getDeviceWave(apiDevice, dotNum, stepX)
+      dots: wave.dots,
+      labels: wave.labels,
     })
   })
 
   const scales = {}
   const datasets = []
-  new Array(sources, buffers, devices).forEach((cat) => {
+  new Array(sourcesWave, buffersWave, devicesWave).forEach((cat) => {
     cat.forEach((comp) => {
       console.log(comp.dots)
       scales[comp.name] = {
@@ -74,15 +83,35 @@ export default async function getGrid() {
         backgroundColor: CHART_COLORS.red,
         stepped: true,
         yAxisID: comp.name,
+        datalabels: {
+          formatter: (val, ctx) => comp.labels[ctx.dataIndex],
+          align: 'left',
+          anchor: 'start',
+          //offest: 3,
+        },
       },)
     })
   })
 
   return {
     options: {
-      responsive: true,
+      //responsive: true,
+      events: [],
       maintainAspectRatio: false,
-      scales: scales
+      scales: scales,
+      plugins: {
+        datalabels: {
+          backgroundColor: function(context) {
+            return CHART_COLORS.blue;
+          },
+          borderRadius: 4,
+          color: 'white',
+          font: {
+            weight: 'bold'
+          },
+          padding: 4
+        }
+      },
     },
     data: {
       labels: gridX,
@@ -96,44 +125,76 @@ function toInt(timestamp) {
 }
 
 function getSourceWave(apiSource, dotNum, step) {
-  const dots = new Array(dotNum).fill('')
+  const wave = {
+    dots: new Array(dotNum).fill(''), 
+    labels: new Array(dotNum).fill(null),
+  }
   apiSource.generated.forEach((rwt) => {
     console.log(toInt(rwt.time))
     console.log(step)
     const intTime = toInt(rwt.time)
     const genDot = Math.floor(intTime / step)
-    dots[genDot] = `Source #${apiSource.sourceNum}`
+    wave.labels[genDot] = `${rwt.request.sourceNumber}.${rwt.request.requestNumber}`
+    wave.dots[genDot] = `Source #${apiSource.sourceNum}`
   })
 
-  return dots
+  return wave
 }
 
 function getBufferWave(apiBuffer, dotNum, step) {
-  const dots = new Array(dotNum).fill('')
+  console.log(apiBuffer)
+  const wave = {
+    dots: new Array(dotNum).fill(''), 
+    labels: new Array(dotNum).fill(null),
+  }
   apiBuffer.processed.forEach((rwse) => {
     const startTime = toInt(rwse.start)
     const endTime = toInt(rwse.end)
     let startDot = Math.floor(startTime / step)
     const endDot = Math.floor(endTime / step)
+    wave.labels[startDot] = `${rwse.request.sourceNumber}.${rwse.request.requestNumber}`
     for (; startDot <= endDot; startDot++) {
-      dots[startDot] = `Buffer #${apiBuffer.bufNum}`
+      wave.dots[startDot] = `Buffer #${apiBuffer.bufNum}`
     }
   })
 
-  return dots
+  if ("current" in apiBuffer) {
+    const rwt = apiBuffer.current
+    let currentStartDot = Math.floor(toInt(rwt.time) / step)
+    wave.labels[currentStartDot] = `${rwt.request.sourceNumber}.${rwt.request.requestNumber}`
+    for (; currentStartDot < dotNum; currentStartDot++) {
+      console.log(currentStartDot)
+      wave.dots[currentStartDot] = `Buffer #${apiBuffer.bufNum}`
+    }
+  }
+
+  return wave
 }
 
 function getDeviceWave(apiDevice, dotNum, step) {
-  const dots = new Array(dotNum).fill('')
+  const wave = {
+    dots: new Array(dotNum).fill(''), 
+    labels: new Array(dotNum).fill(null),
+  }
   apiDevice.done.forEach((rwse) => {
     const startTime = toInt(rwse.start)
     const endTime = toInt(rwse.end)
     let startDot = Math.floor(startTime / step)
     const endDot = Math.floor(endTime / step)
+    wave.labels[startDot] = `${rwse.request.sourceNumber}.${rwse.request.requestNumber}`
     for (; startDot <= endDot; startDot++) {
-      dots[startDot] = `Device #${apiDevice.devNum}`
+      wave.dots[startDot] = `Device #${apiDevice.devNum}`
     }
   })
 
-  return dots
+  if ("current" in apiDevice) {
+    const rwt = apiDevice.current
+    let currentStartDot = Math.floor(toInt(rwt.time) / step)
+    wave.labels[currentStartDot] = `${rwt.request.sourceNumber}.${rwt.request.requestNumber}`
+    for (; currentStartDot < dotNum; currentStartDot++) {
+      wave.dots[currentStartDot] = `Device #${apiDevice.devNum}`
+    }
+  }
+
+  return wave
 }
