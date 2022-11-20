@@ -23,7 +23,7 @@ import {
   Routes
 } from "react-router-dom";
 import Home from "./Home";
-import Stuff from "./Stuff";
+import Svod from "./Svod";
 import Waveform from "./Waveform";
 import {
   Chart as ChartJS,
@@ -58,7 +58,7 @@ class Main extends Component {
   }
 
   render() {
-    let links = ["/", "/waveform", "/stuff"]
+    let links = ["/", "/waveform", "/svod"]
     const drawer = (
       <div>
         <Toolbar />
@@ -118,7 +118,7 @@ class Main extends Component {
         >
           <Routes>
             <Route exact path="/" element={<Home/>}/>
-            <Route path="/stuff" element={<Stuff/>}/>
+            <Route path="/stuff" element={<Svod/>}/>
             <Route path="/waveform" element={<Waveform/>}/>
           </Routes> 
         </Box>

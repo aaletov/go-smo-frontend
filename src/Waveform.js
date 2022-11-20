@@ -1,57 +1,87 @@
-import React, { useState } from "react";
+import React, { Component, useEffect, useState, useRef } from "react";
 import Box from '@mui/material/Box';
-import './waveform.css'; 
-//import WaveFetcher from './WaveFetcher.js';
+import { Line } from 'react-chartjs-2';
+import getGrid from './utils/waveutil';
 
 export default function Waveform() {
-  const [waveScript, setWaveScript] = useState()
-
-  React.useEffect(() => {
-    fetch("http://localhost:8081/getWaveNumber")
-    .then((response) => {
-      return response.json();
-    })
-    .then((num) => {
-      let script = {}
-      script.signal = []
-      for (let i = 0; i < num; i++) {
-        script.signal.push({name: "c", wave: "p"})
-      }
-      setWaveScript(`<script type="WaveDrom">${JSON.stringify(script)}</script>`)
-      eval("WaveDrom.ProcessAll()")
-    });
-    const interval = setInterval(()=>{
-      let promises = []
-      promises.push(fetch("http://localhost:8081/getWaveInfo")
-      .then((response) => {
-        return response.json();
-      }))
-      .then((json) => {
-        console.log(json)
-      })
-
-      // setWaveScript(`
-      //   <script type="WaveDrom">
-      //     { signal : [
-      //       { name: "clk",  wave: "p......" },
-      //       { name: "bus",  wave: "x.34.5x",   data: "head body tail" },
-      //       { name: "wire", wave: "0.1..0." },
-      //     ]}
-      //   </script>
-      // `)
-      eval("WaveDrom.ProcessAll()")
-    }, 1000)
-    return () => clearInterval(interval)
+  //const grid = await getGrid()
+  const [grid, setGrid] = useState({
+    data: {
+      labels: [""],
+      datasets: [{
+        label: "",
+        data: [""]
+      }]
+    }, 
+    options: ""
   })
+  useEffect(() => {
+    async function updateGrid() {
+      const newGrid = await getGrid()
+      setGrid(newGrid)
+    }
+    updateGrid()
+  }, [])
 
+  const [width, setWidth] = useState("auto")
+  // const ref = useRef(0)
+  // const [plotLabels, setPlotLabels] = useState(new Array(100).fill(""));
+  // const [setData, setSetData] = useState(new Array(100).fill(10));
+  // const poptions = {
+  //   maintainAspectRatio: false,
+  //   scales: {
+  //     y: {
+  //       beginAtZero: true,
+  //     }
+  //   }
+  // };
+  // let startWidth = 0
+
+  // let interval = setInterval(() => {
+  //   if (width == "auto") {
+  //     startWidth = ref.current.width
+  //   }
+  //   const newSetData = setData.slice()
+  //   const newPlotLabels = plotLabels.slice()
+  //   for (let i = 0; i < 20; i++) {
+  //     newSetData.push(10 + i)
+  //     newPlotLabels.push("")
+  //   }
+  //   setSetData(newSetData);
+  //   setPlotLabels(newPlotLabels);
+  //   const intWidth = ref.current.width
+  //   setWidth(String(intWidth + startWidth) + "px");
+  // }, 2000);
+  
   return (
-    <Box
-      position="relative"
-      sx={{
-      width: "100%",
-      height: "100%",
-      }}>
-      <div dangerouslySetInnerHTML={{__html: waveScript}}/>
+    <Box 
+      height = "85vh"
+      width = "100%"
+      margin = "10px"
+    >
+      <Box sx={{
+        overflowX: "scroll"
+        }}
+        height = "inherit"
+        width = {width}
+        margin = "30px"
+        >
+        <Line
+          //ref = {ref}
+          type = "bar"
+          // data = {{
+          //   labels: plotLabels,
+          //   datasets: [{
+          //     label: '# of Votes',
+          //     data: setData,
+          //     borderWidth: 1
+          //   }]
+          // }}
+          data = {grid.data}
+          //data = {grid.data}
+          options = {grid.options}
+        />
+      </Box>
     </Box>
   );
 }

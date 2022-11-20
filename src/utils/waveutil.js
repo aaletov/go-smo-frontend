@@ -16,18 +16,19 @@ export const CHART_COLORS = {
 export default async function getGrid() {
   let waveInfo = await fetch("http://localhost:8081/getWaveInfo")
   .then((r) => r.json())
-  const dotNum = 50
+  const approxDotNum = 50
   const startX = toInt(waveInfo.startTime)
   const endX = toInt(waveInfo.endTime)
-  const stepX = (endX - startX) / dotNum
+  const stepX = Math.ceil(((endX - startX) / approxDotNum) / 10) * 10
+  const dotNum = Math.ceil((endX - startX) / stepX)
   console.log(startX)
   console.log(endX)
   console.log(stepX)
   const gridX = [startX]
-  for (let i = 1; i < dotNum - 1; i++) {
+  for (let i = 1; i < dotNum; i++) {
     gridX.push(i * stepX)
   }
-  gridX.push(endX)
+  //gridX.push(endX)
   console.log(waveInfo)
   
   const sourcesWave = []
@@ -66,6 +67,9 @@ export default async function getGrid() {
     cat.forEach((comp) => {
       console.log(comp.dots)
       scales[comp.name] = {
+        afterFit: function(scaleInstance) {
+          scaleInstance.width = 70; // sets the width to 100px
+        },
         type: 'category',
         labels: [comp.name, ''],
         offset: true,
@@ -73,8 +77,8 @@ export default async function getGrid() {
         stack: 'demo',
         stackWeight: 1,
         grid: {
-          borderColor: CHART_COLORS.blue
-        }
+          borderColor: CHART_COLORS.red
+        },
       }
       datasets.push({
         label: comp.name,
@@ -85,7 +89,7 @@ export default async function getGrid() {
         yAxisID: comp.name,
         datalabels: {
           formatter: (val, ctx) => comp.labels[ctx.dataIndex],
-          align: 'left',
+          align: 'center',
           anchor: 'start',
           //offest: 3,
         },
@@ -95,8 +99,18 @@ export default async function getGrid() {
 
   return {
     options: {
+      layout: {
+        padding: {
+            left: 0
+        }
+      },
       //responsive: true,
       events: [],
+      elements: {
+        point:{
+            radius: 0
+        }
+      },
       maintainAspectRatio: false,
       scales: scales,
       plugins: {
@@ -110,7 +124,10 @@ export default async function getGrid() {
             weight: 'bold'
           },
           padding: 4
-        }
+        },
+        legend: {
+          display: false,
+        },
       },
     },
     data: {
