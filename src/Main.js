@@ -23,7 +23,7 @@ import {
   Routes
 } from "react-router-dom";
 import Home from "./Home";
-import Svod from "./Svod";
+import PivotPage from "./PivotPage";
 import Waveform from "./Waveform";
 import {
   Chart as ChartJS,
@@ -58,13 +58,13 @@ class Main extends Component {
   }
 
   render() {
-    let links = ["/", "/waveform", "/svod"]
+    let links = ["/", "/waveform", "/pivot"]
     const drawer = (
       <div>
         <Toolbar />
         <Divider />
         <List>
-          {['Home', 'Waveform', 'Svod'].map((text, index) => ( 
+          {['Home', 'Waveform', 'Pivot'].map((text, index) => ( 
             <NavLink to={links[index]}> 
               <ListItem key={text} disablePadding>
                 <ListItemButton>
@@ -118,7 +118,7 @@ class Main extends Component {
         >
           <Routes>
             <Route exact path="/" element={<Home/>}/>
-            <Route path="/stuff" element={<Svod/>}/>
+            <Route path="/pivot" element={<PivotPage/>}/>
             <Route path="/waveform" element={<Waveform/>}/>
           </Routes> 
         </Box>
