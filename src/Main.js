@@ -25,6 +25,7 @@ import {
 import Home from "./Home";
 import PivotPage from "./PivotPage";
 import Waveform from "./Waveform";
+import SystemInit from "./SystemInit";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -58,13 +59,13 @@ class Main extends Component {
   }
 
   render() {
-    let links = ["/", "/waveform", "/pivot"]
+    let links = ["/", "/systeminit", "/waveform", "/pivot"]
     const drawer = (
       <div>
         <Toolbar />
         <Divider />
         <List>
-          {['Home', 'Waveform', 'Pivot'].map((text, index) => ( 
+          {['Home', 'Initialize System', 'Waveform', 'Pivot'].map((text, index) => ( 
             <NavLink to={links[index]}> 
               <ListItem key={text} disablePadding>
                 <ListItemButton>
@@ -118,6 +119,7 @@ class Main extends Component {
         >
           <Routes>
             <Route exact path="/" element={<Home/>}/>
+            <Route path="/systeminit" element={<SystemInit/>} />
             <Route path="/pivot" element={<PivotPage/>}/>
             <Route path="/waveform" element={<Waveform/>}/>
           </Routes> 
